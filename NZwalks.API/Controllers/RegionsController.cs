@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NZwalks.API.Data;
+using NZwalks.API.Models.DTO;
 
 namespace NZwalks.API.Controllers
 {
@@ -18,7 +19,20 @@ namespace NZwalks.API.Controllers
         public IActionResult GetAll()
         {
             var regions = dbContext.Regions.ToList();
-            return Ok(regions);
+            var regionsDto = new List<RegionDTO>();
+            foreach (var region in regions)
+            {
+                regionsDto.Add(new RegionDTO()
+                {
+                    Id = region.Id,
+                    Code = region.Code,
+                    Name = region.Name,
+                    RegionImageUrl = region.RegionImageUrl
+                });
+            }
+
+
+            return Ok(regionsDto);
         }
         [HttpGet]
         [Route("{id:Guid}")]
