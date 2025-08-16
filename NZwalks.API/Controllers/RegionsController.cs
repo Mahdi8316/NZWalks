@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NZwalks.API.Data;
+using NZwalks.API.Models.Domain;
 using NZwalks.API.Models.DTO;
 
 namespace NZwalks.API.Controllers
@@ -45,8 +46,29 @@ namespace NZwalks.API.Controllers
             {
                 return NotFound();
             }
+            var regionsDto = new RegionDTO
+            {
+                
+                Code = region.Code,
+                Name = region.Name,
+                RegionImageUrl = region.RegionImageUrl
+            };
 
-            return Ok(region);
+            return Ok(regionsDto);
+        }
+        [HttpPost]
+        public IActionResult Create([FromBody] AddRequestRegionDto addRequestRegionDto)
+        {
+            var region = new Region
+            {
+                Code = addRequestRegionDto.Code,
+                Name = addRequestRegionDto.Name,
+                RegionImageUrl= addRequestRegionDto.RegionImageUrl
+            };
+            dbContext.Regions.Add(region);
+            dbContext.SaveChanges();
+
+            return CreatedAtAction(nameof(GetById),new {id = region.Id},region);
         }
     }
 }
