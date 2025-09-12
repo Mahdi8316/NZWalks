@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NZwalks.API.CustomActionFilter;
 using NZwalks.API.Data;
 using NZwalks.API.Models.Domain;
 using NZwalks.API.Models.DTO;
@@ -66,18 +67,26 @@ namespace NZwalks.API.Controllers
             return Ok(regionsDto);
         }
         [HttpPost]
+        [ValidateModel]
         public async Task<IActionResult> Create([FromBody] AddRequestRegionDto addRequestRegionDto)
         {
-            var region = new Region
+            if (ModelState.IsValid)
             {
-                Code = addRequestRegionDto.Code,
-                Name = addRequestRegionDto.Name,
-                RegionImageUrl= addRequestRegionDto.RegionImageUrl
-            };
-            await dbContext.Regions.AddAsync(region);
-            await dbContext.SaveChangesAsync();
+                var region = new Region
+                {
+                    Code = addRequestRegionDto.Code,
+                    Name = addRequestRegionDto.Name,
+                    RegionImageUrl = addRequestRegionDto.RegionImageUrl
+                };
+                await dbContext.Regions.AddAsync(region);
+                await dbContext.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById),new {id = region.Id},region);
+                return CreatedAtAction(nameof(GetById), new { id = region.Id }, region);
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
         }
         [HttpPut]
         [Route("{id:Guid}")]
